@@ -9,7 +9,7 @@ set -euo pipefail
 
 # Filled in when a release is published. Tests point CUE_BASE_URL at a local server.
 RELEASE_BASE_URL="https://trycue.github.io"
-VERSION="1.0.1"
+VERSION="1.0.2"
 
 BASE_URL="${CUE_BASE_URL:-$RELEASE_BASE_URL}"
 BUNDLE_ID="io.github.trycue.cue"
@@ -42,15 +42,49 @@ stop_agents() {
   launchctl bootout "$DOMAIN/$GUARDIAN_LABEL" 2>/dev/null || true
 }
 
+# Quits copies of Cue the user opened themselves (launchd doesn't know about those).
+# Matches the exact executable path, never a pattern, and only this user's processes.
+quit_running() {
+  local exe pids
+  for exe in "$1/Contents/MacOS/Cue" "$1/Contents/Helpers/cue-guardian"; do
+    pids="$(ps -U "$(id -u)" -o pid=,comm= | EXE="$exe" awk '{ pid = $1; sub(/^ *[0-9]+ /, ""); if ($0 == ENVIRON["EXE"]) print pid }')"
+    [ -n "$pids" ] && kill -TERM $pids 2>/dev/null || true
+  done
+  return 0
+}
+
+# Clears a saved "disabled" state (Settings → Open at login) without leaving a new record behind.
+enable_if_disabled() {
+  if launchctl print-disabled "$DOMAIN" 2>/dev/null | grep -qE "\"$1\" => (disabled|true)"; then
+    launchctl enable "$DOMAIN/$1" 2>/dev/null || true
+  fi
+}
+
+LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+
 uninstall() {
   say "Removing Cue..."
   stop_agents
   rm -f "$AGENTS/$GUARDIAN_LABEL.plist" "$AGENTS/$MENUBAR_LABEL.plist"
-  launchctl enable "$DOMAIN/$GUARDIAN_LABEL" 2>/dev/null || true
-  launchctl enable "$DOMAIN/$MENUBAR_LABEL" 2>/dev/null || true
-  if app="$(installed_app)"; then rm -rf "$app"; fi
+  enable_if_disabled "$GUARDIAN_LABEL"
+  enable_if_disabled "$MENUBAR_LABEL"
+  for dir in /Applications "$HOME/Applications"; do
+    if is_cue "$dir/Cue.app"; then
+      quit_running "$dir/Cue.app"
+      "$LSREGISTER" -u "$dir/Cue.app" 2>/dev/null || true
+      rm -rf "$dir/Cue.app"
+    fi
+  done
   rm -rf "$SUPPORT" "$LOGS"
-  rm -f "$HOME/Library/Preferences/$BUNDLE_ID.plist"
+  # Files macOS creates for any app: preferences, caches, saved window state.
+  defaults delete "$BUNDLE_ID" 2>/dev/null || true
+  rm -rf "$HOME/Library/Preferences/$BUNDLE_ID.plist" \
+         "$HOME/Library/Caches/$BUNDLE_ID" \
+         "$HOME/Library/HTTPStorages/$BUNDLE_ID" "$HOME/Library/HTTPStorages/$BUNDLE_ID.binarycookies" \
+         "$HOME/Library/Saved Application State/$BUNDLE_ID.savedState"
+  local cache_dir
+  cache_dir="$(getconf DARWIN_USER_CACHE_DIR 2>/dev/null || true)"
+  [ -n "$cache_dir" ] && rm -rf "${cache_dir%/}/$BUNDLE_ID"
   ok "Cue has been removed."
 }
 
@@ -121,6 +155,7 @@ install() {
   fi
 
   stop_agents
+  [ -e "$dest" ] && quit_running "$dest"
   rm -rf "$dest"
   ditto "$new" "$dest"
   ok "Added to $dest_dir"
@@ -134,7 +169,7 @@ install() {
 	<key>LimitLoadToSessionType</key><string>Aqua</string>"
 
   for label in "$GUARDIAN_LABEL" "$MENUBAR_LABEL"; do
-    launchctl enable "$DOMAIN/$label"
+    enable_if_disabled "$label"
     launchctl bootstrap "$DOMAIN" "$AGENTS/$label.plist" || fail "Could not start $label."
   done
   ok "Started the background guardian"
