@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cue for Mac</title>
+<meta name="description" content="Cue warns you before your Mac slows down and fixes it with one click.">
+<style>
+:root {
+  --bg: #f5f5f7; --card: #ffffff; --ink: #1d1d1f; --muted: #6e6e73; --line: #d2d2d7;
+  --accent: #0071e3; --code-bg: #1d1d1f; --code-ink: #f5f5f7; --ok: #1f8a4c;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #000000; --card: #1c1c1e; --ink: #f5f5f7; --muted: #a1a1a6; --line: #38383a;
+          --accent: #2997ff; --code-bg: #2c2c2e; --code-ink: #f5f5f7; --ok: #30d158; color-scheme: dark; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+       font: 17px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; }
+main { max-width: 640px; margin: 0 auto; padding: 72px 20px 64px; display: grid; gap: 28px; }
+header { display: grid; gap: 14px; justify-items: center; text-align: center; }
+.icon { width: 84px; height: 84px; border-radius: 19px; display: grid; place-items: center;
+        background: linear-gradient(180deg, #3d66fa, #1c298c); box-shadow: 0 8px 24px rgba(28, 41, 140, .3); }
+h1 { font: 700 40px/1.1 -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; margin: 0; letter-spacing: -.02em; }
+.lede { color: var(--muted); font-size: 19px; margin: 0; max-width: 34ch; }
+.card { background: var(--card); border-radius: 18px; padding: 24px; display: grid; gap: 16px; }
+h2 { font-size: 20px; margin: 0; }
+ol { margin: 0; padding-left: 22px; display: grid; gap: 10px; }
+.cmd { display: flex; align-items: center; gap: 10px; background: var(--code-bg); color: var(--code-ink);
+       border-radius: 12px; padding: 12px 12px 12px 16px; }
+.cmd code { flex: 1; font: 14px/1.4 ui-monospace, "SF Mono", Menlo, monospace; overflow-x: auto; white-space: nowrap; }
+button { font: 600 15px -apple-system, BlinkMacSystemFont, sans-serif; border: 0; border-radius: 980px;
+         padding: 8px 18px; background: var(--accent); color: #fff; cursor: pointer; flex: none; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+kbd { font: 13px ui-monospace, "SF Mono", Menlo, monospace; border: 1px solid var(--line); border-bottom-width: 2px;
+      border-radius: 5px; padding: 1px 6px; }
+.muted { color: var(--muted); font-size: 15px; margin: 0; }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+details summary { cursor: pointer; font-weight: 600; }
+details .cmd { margin-top: 12px; }
+footer { text-align: center; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="icon" aria-hidden="true">
+      <svg width="46" height="46" viewBox="0 0 32 32"><path d="M16 3 5 7v8c0 7 4.7 12 11 14 6.3-2 11-7 11-14V7L16 3Z" fill="#fff"/><path d="m11 16 3.5 3.5L21 12.5" fill="none" stroke="#2f4bd8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h1>Cue</h1>
+    <p class="lede">Warns you before your Mac slows down, tells you which app is the cause, and fixes it with one click.</p>
+  </header>
+
+  <section class="card" aria-labelledby="install">
+    <h2 id="install">Install</h2>
+    <ol>
+      <li>Open <b>Terminal</b>: press <kbd>⌘</kbd> <kbd>Space</kbd>, type <b>Terminal</b>, press <kbd>Return</kbd>.</li>
+      <li>Copy this line and paste it into Terminal, then press <kbd>Return</kbd>:
+        <div class="cmd" style="margin-top:10px">
+          <code id="install-cmd">curl -fsSL https://trycue.github.io/install.sh | bash</code>
+          <button type="button" data-copy="install-cmd">Copy</button>
+        </div>
+      </li>
+      <li>Look for the Cue icon in your menu bar, at the top right of your screen.</li>
+    </ol>
+    <p class="muted">Takes about 10 seconds. No password needed. macOS shows a “Background item added” note once, and Cue asks to send notifications. Click <b>Allow</b>.</p>
+  </section>
+
+  <section class="card" aria-labelledby="needs">
+    <h2 id="needs">What you need</h2>
+    <ul>
+      <li>A Mac with Apple silicon (M1 or newer)</li>
+      <li>macOS 13 Ventura or newer</li>
+    </ul>
+  </section>
+
+  <section class="card" aria-labelledby="privacy">
+    <h2 id="privacy">Privacy</h2>
+    <p class="muted">Cue runs on your Mac. If you leave “Share anonymous stats” on, it sends once a day: a random install ID, your Mac model, memory size, macOS version, how often it warned and fixed, and the names of the heaviest apps. Never your name, files, websites or anything you type. You can turn it off in Settings.</p>
+  </section>
+
+  <section class="card">
+    <details>
+      <summary>Uninstall</summary>
+      <p class="muted" style="margin-top:10px">Open Cue’s Settings and click <b>Uninstall Cue</b>, or paste this into Terminal:</p>
+      <div class="cmd">
+        <code id="uninstall-cmd">curl -fsSL https://trycue.github.io/install.sh | bash -s -- --uninstall</code>
+        <button type="button" data-copy="uninstall-cmd">Copy</button>
+      </div>
+    </details>
+  </section>
+
+  <footer>Cue 1.0</footer>
+</main>
+<script>
+document.querySelectorAll("[data-copy]").forEach(function (button) {
+  button.addEventListener("click", function () {
+    var text = document.getElementById(button.dataset.copy).textContent;
+    navigator.clipboard.writeText(text).then(function () {
+      button.textContent = "Copied";
+      setTimeout(function () { button.textContent = "Copy"; }, 1600);
+    }, function () {
+      var range = document.createRange();
+      range.selectNodeContents(document.getElementById(button.dataset.copy));
+      getSelection().removeAllRanges();
+      getSelection().addRange(range);
+      button.textContent = "Press ⌘C";
+    });
+  });
+});
+</script>
+</body>
+</html>
