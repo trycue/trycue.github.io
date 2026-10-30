@@ -9,7 +9,7 @@ set -euo pipefail
 
 # Filled in when a release is published. Tests point CUE_BASE_URL at a local server.
 RELEASE_BASE_URL="https://trycue.github.io"
-VERSION="1.0.0"
+VERSION="1.0.1"
 
 BASE_URL="${CUE_BASE_URL:-$RELEASE_BASE_URL}"
 BUNDLE_ID="io.github.trycue.cue"
@@ -141,7 +141,7 @@ install() {
   ok "Set to open when you log in"
   rm -rf "$tmp"
   say ""
-  say "Done. Look for the shield icon in your menu bar, at the top right of your screen."
+  say "Done. Look for the ring icon in your menu bar, at the top right of your screen."
 }
 
 case "${1:-}" in

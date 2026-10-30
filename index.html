@@ -21,7 +21,7 @@ body { margin: 0; background: var(--bg); color: var(--ink);
 main { max-width: 640px; margin: 0 auto; padding: 72px 20px 64px; display: grid; gap: 28px; }
 header { display: grid; gap: 14px; justify-items: center; text-align: center; }
 .icon { width: 84px; height: 84px; border-radius: 19px; display: grid; place-items: center;
-        background: linear-gradient(180deg, #3d66fa, #1c298c); box-shadow: 0 8px 24px rgba(28, 41, 140, .3); }
+        background: linear-gradient(180deg, #262b40, #0a0d17); box-shadow: 0 8px 24px rgba(10, 13, 23, .35), inset 0 0 0 1px rgba(255,255,255,.08); }
 h1 { font: 700 40px/1.1 -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; margin: 0; letter-spacing: -.02em; }
 .lede { color: var(--muted); font-size: 19px; margin: 0; max-width: 34ch; }
 .card { background: var(--card); border-radius: 18px; padding: 24px; display: grid; gap: 16px; }
@@ -46,7 +46,7 @@ footer { text-align: center; color: var(--muted); font-size: 13px; }
 <main>
   <header>
     <div class="icon" aria-hidden="true">
-      <svg width="46" height="46" viewBox="0 0 32 32"><path d="M16 3 5 7v8c0 7 4.7 12 11 14 6.3-2 11-7 11-14V7L16 3Z" fill="#fff"/><path d="m11 16 3.5 3.5L21 12.5" fill="none" stroke="#2f4bd8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="58" height="58" viewBox="0 0 32 32"><defs><linearGradient id="ring" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6bf5cc"/><stop offset=".5" stop-color="#45bdff"/><stop offset="1" stop-color="#8775ff"/></linearGradient><filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation=".9"/></filter></defs><g fill="none" stroke="url(#ring)" stroke-width="4.2" stroke-linecap="round"><path d="M24.29 8.54 A11.6 11.6 0 1 0 24.29 23.46" opacity=".55" filter="url(#glow)"/><path d="M24.29 8.54 A11.6 11.6 0 1 0 24.29 23.46"/></g><circle cx="27" cy="16" r="2.2" fill="#fff"/></svg>
     </div>
     <h1>Cue</h1>
     <p class="lede">Warns you before your Mac slows down, tells you which app is the cause, and fixes it with one click.</p>
@@ -62,7 +62,7 @@ footer { text-align: center; color: var(--muted); font-size: 13px; }
           <button type="button" data-copy="install-cmd">Copy</button>
         </div>
       </li>
-      <li>Look for the Cue icon in your menu bar, at the top right of your screen.</li>
+      <li>Look for the ring icon in your menu bar, at the top right of your screen.</li>
     </ol>
     <p class="muted">Takes about 10 seconds. No password needed. macOS shows a “Background item added” note once, and Cue asks to send notifications. Click <b>Allow</b>.</p>
   </section>
