@@ -3,136 +3,230 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cue: stop your Mac from freezing</title>
-<meta name="description" content="Cue warns you before your Mac slows down, tells you which app is the cause, and fixes it with one click. Free, tiny, and private.">
-<meta property="og:title" content="Cue: stop your Mac from freezing">
-<meta property="og:description" content="Warns you before your Mac slows down and fixes it with one click.">
+<title>Cue — Your Mac shouldn't freeze</title>
+<meta name="description" content="Cue warns you before your Mac slows down, names the app that's causing it, and fixes it in one click. Free for Apple silicon Macs.">
+<meta property="og:title" content="Cue — Your Mac shouldn't freeze">
+<meta property="og:description" content="Warns you before your Mac slows down and fixes it in one click.">
 <meta property="og:image" content="https://trycue.github.io/assets/icon.png">
 <link rel="icon" href="assets/favicon.png">
 <style>
 :root {
-  --bg: #07080d; --bg-2: #0d0f17; --card: rgba(255,255,255,.04); --line: rgba(255,255,255,.08);
-  --ink: #f4f5f8; --muted: #9aa0ae; --dim: #6b7080;
-  --mint: #6bf5cc; --sky: #45bdff; --indigo: #8775ff; --orange: #ff9f43; --red: #ff5a5f;
-  --grad: linear-gradient(100deg, var(--mint), var(--sky) 45%, var(--indigo));
-  color-scheme: dark;
+  --bg: #fbfbfa; --paper: #ffffff; --ink: #111113; --ink-2: #3c3c43; --muted: #6e6e76; --faint: #a1a1aa;
+  --line: #e9e9ec; --soft: #f3f3f2; --accent: #3a7cff;
+  --shadow: 0 1px 2px rgba(17,17,19,.04), 0 8px 24px rgba(17,17,19,.06);
+  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before { animation: none !important; transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation: none !important; transition: none !important; } }
 body { margin: 0; background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased;
-       font: 17px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif; }
+       font: 17px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; }
 a { color: inherit; }
-.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+img { max-width: 100%; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 11px 20px; border: 0; cursor: pointer;
+       font: 600 15px/1 -apple-system, BlinkMacSystemFont, sans-serif; text-decoration: none; transition: transform .15s, background .15s; }
+.btn:active { transform: scale(.98); }
+.btn-dark { background: var(--ink); color: #fff; }
+.btn-dark:hover { background: #2a2a2e; }
+.btn-ghost { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.btn-ghost:hover { background: var(--soft); }
+.btn svg { width: 15px; height: 15px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 
 /* Nav */
-nav { position: sticky; top: 0; z-index: 10; backdrop-filter: saturate(180%) blur(16px); -webkit-backdrop-filter: saturate(180%) blur(16px);
-      background: rgba(7,8,13,.7); border-bottom: 1px solid var(--line); }
-nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -.01em; text-decoration: none; font-size: 18px; }
-.brand img { width: 28px; height: 28px; }
-nav .links { display: flex; gap: 28px; align-items: center; font-size: 15px; color: var(--muted); }
-nav .links a { text-decoration: none; }
-nav .links a:hover { color: var(--ink); }
-.pill { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 8px 16px; font-weight: 600; font-size: 15px;
-        text-decoration: none; background: var(--ink); color: #0b0c12; border: 0; cursor: pointer; font-family: inherit; }
-.pill:hover { background: #fff; }
-@media (max-width: 720px) { nav .links a:not(.pill) { display: none; } }
+nav { position: sticky; top: 0; z-index: 20; background: rgba(251,251,250,.78); backdrop-filter: saturate(180%) blur(14px);
+      -webkit-backdrop-filter: saturate(180%) blur(14px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+nav.scrolled { border-bottom-color: var(--line); }
+nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.brand { display: flex; align-items: center; gap: 9px; font: 650 17px var(--display); letter-spacing: -.01em; text-decoration: none; }
+.brand img { width: 26px; height: 26px; }
+.navlinks { display: flex; align-items: center; gap: 28px; font-size: 14.5px; color: var(--muted); }
+.navlinks a { text-decoration: none; }
+.navlinks a:hover { color: var(--ink); }
+.navlinks .btn { padding: 8px 15px; font-size: 14px; color: #fff; }
+.navlinks .btn:hover { color: #fff; }
+@media (max-width: 680px) { .navlinks a:not(.btn) { display: none; } }
 
 /* Hero */
-.hero { position: relative; overflow: hidden; padding: 96px 0 40px; }
-.hero::before { content: ""; position: absolute; inset: -30% -10% auto; height: 820px; pointer-events: none;
-  background: radial-gradient(40% 50% at 30% 30%, rgba(107,245,204,.16), transparent 70%),
-              radial-gradient(40% 50% at 70% 25%, rgba(135,117,255,.20), transparent 70%),
-              radial-gradient(30% 40% at 50% 60%, rgba(69,189,255,.12), transparent 70%); }
-.hero .wrap { position: relative; display: grid; grid-template-columns: 1.05fr .95fr; gap: 56px; align-items: center; }
-@media (max-width: 920px) { .hero .wrap { grid-template-columns: 1fr; } .hero { padding-top: 64px; } }
-.badge { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); border: 1px solid var(--line);
-         background: var(--card); padding: 6px 12px; border-radius: 999px; }
-.badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 10px var(--mint); }
-h1 { font: 800 clamp(44px, 6.4vw, 76px)/1.02 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
-     letter-spacing: -.035em; margin: 22px 0 20px; }
-h1 .g { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.lede { font-size: 20px; color: var(--muted); max-width: 32em; margin: 0 0 32px; }
-.install { display: flex; align-items: center; gap: 8px; background: #11131c; border: 1px solid var(--line); border-radius: 14px;
-           padding: 8px 8px 8px 18px; max-width: 620px; box-shadow: 0 20px 60px rgba(0,0,0,.35); }
-.install code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; font: 13.5px/1.4 ui-monospace, "SF Mono", Menlo, monospace; color: #dfe3ec; }
-.install code .p { color: var(--dim); user-select: none; }
-.copy { flex: none; border: 0; border-radius: 10px; padding: 10px 16px; font: 600 14px -apple-system, BlinkMacSystemFont, sans-serif;
-        cursor: pointer; color: #07080d; background: var(--grad); }
-.copy:focus-visible, .pill:focus-visible, summary:focus-visible { outline: 2px solid var(--sky); outline-offset: 3px; }
-.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 18px; font-size: 14px; color: var(--dim); }
-.meta span::before { content: "✓ "; color: var(--mint); }
+.hero { padding: 72px 0 0; text-align: center; }
+.tag { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 6px; border-radius: 999px; font-size: 13.5px;
+       color: var(--ink-2); background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); }
+.tag b { font-weight: 600; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #eaf6f1; color: #13795b; }
+h1 { font: 700 clamp(44px, 7vw, 80px)/1.02 var(--display); letter-spacing: -.045em; margin: 24px auto 20px; max-width: 12em; text-wrap: balance; }
+.lede { font-size: clamp(18px, 2vw, 21px); color: var(--muted); max-width: 31em; margin: 0 auto 32px; line-height: 1.5; }
+.cta-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.fineprint { margin-top: 16px; font-size: 13.5px; color: var(--faint); }
 
-.shot { position: relative; justify-self: center; width: min(420px, 100%); }
-.shot::before { content: ""; position: absolute; inset: 8% -12% -6%; background: var(--grad); filter: blur(70px); opacity: .28; border-radius: 40%; }
-.shot img { position: relative; display: block; width: 100%; height: auto; border-radius: 22px; border: 1px solid rgba(255,255,255,.1);
-            box-shadow: 0 40px 100px rgba(0,0,0,.6); }
-.menubar { position: relative; display: flex; justify-content: flex-end; align-items: center; gap: 14px; margin: 0 0 14px; padding: 7px 14px;
-           border-radius: 12px; background: rgba(255,255,255,.06); border: 1px solid var(--line); font-size: 13px; color: var(--muted); }
-.menubar svg { display: block; }
+/* Desktop scene */
+.scene { position: relative; margin: 64px auto 0; max-width: 1040px; aspect-ratio: 16 / 9.2; border-radius: 22px; overflow: hidden;
+         background:
+           radial-gradient(60% 70% at 18% 30%, #cfe6ff 0%, transparent 60%),
+           radial-gradient(55% 65% at 85% 20%, #e3dcff 0%, transparent 60%),
+           radial-gradient(60% 70% at 60% 95%, #c9f2e3 0%, transparent 60%),
+           linear-gradient(180deg, #eef3fb, #f3effa);
+         box-shadow: 0 30px 80px rgba(40,50,90,.16), 0 0 0 1px rgba(17,17,19,.06); }
+.mbar { position: absolute; inset: 0 0 auto; height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+        background: rgba(255,255,255,.55); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); font-size: 13px; color: #1d1d1f; }
+.mbar .l { display: flex; gap: 18px; align-items: center; }
+.mbar .l b { font-weight: 650; }
+.mbar .r { display: flex; gap: 16px; align-items: center; }
+.cueitem { display: grid; place-items: center; width: 30px; height: 22px; border-radius: 5px; background: rgba(0,0,0,.08); }
+.glyph { width: 14px; height: 10px; border-radius: 3px; background: rgba(29,29,31,.55); }
+.win { position: absolute; left: 4%; top: 17%; width: 64%; bottom: -4%; background: rgba(255,255,255,.9); border-radius: 12px;
+       box-shadow: 0 20px 50px rgba(30,30,60,.12), 0 0 0 1px rgba(17,17,19,.06); overflow: hidden; }
+.wtabs { display: flex; align-items: center; gap: 4px; padding: 10px 12px; background: #eef0f3; }
+.dots { display: flex; gap: 6px; margin-right: 10px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: #d9dbe0; }
+.wt { flex: 1; height: 16px; border-radius: 5px; background: rgba(17,17,19,.07); }
+.wt.on { background: #fff; box-shadow: 0 0 0 1px rgba(17,17,19,.06); }
+.wbody { padding: 26px 28px; display: grid; gap: 11px; text-align: left; }
+.wgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+.wgrid div { height: 90px; border-radius: 10px; background: #f3f4f6; }
+.notif, .panel { z-index: 2; }
+.panel { position: absolute; top: 36px; right: 10.5%; width: 34%; max-width: 360px; border-radius: 14px;
+         box-shadow: 0 24px 60px rgba(30,30,60,.22), 0 0 0 1px rgba(17,17,19,.08); }
+.notif { position: absolute; top: 46px; left: 4%; width: 37%; max-width: 360px; text-align: left; padding: 12px 14px; border-radius: 16px;
+         background: rgba(255,255,255,.78); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+         box-shadow: 0 12px 34px rgba(30,30,60,.14), 0 0 0 1px rgba(17,17,19,.06); display: grid; grid-template-columns: 34px 1fr; gap: 2px 10px;
+         animation: drop .7s .4s cubic-bezier(.2,.8,.2,1) both; }
+.notif img { width: 34px; height: 34px; grid-row: span 3; }
+.notif .t { font-size: 13px; font-weight: 650; display: flex; justify-content: space-between; gap: 8px; }
+.notif .t span { font-weight: 400; color: var(--muted); font-size: 12px; }
+.notif .b { font-size: 13px; color: var(--ink-2); line-height: 1.35; }
+.notif .a { margin-top: 8px; font-size: 12.5px; font-weight: 600; text-align: center; padding: 6px; border-radius: 8px; background: rgba(17,17,19,.06); }
+@keyframes drop { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+@media (max-width: 760px) {
+  .scene { aspect-ratio: auto; height: 560px; }
+  .notif { left: 4%; right: 4%; width: auto; max-width: none; }
+  .panel { top: 190px; left: 50%; right: auto; transform: translateX(-50%); width: 82%; }
+  .mbar .l span { display: none; }
+  .win { display: none; }
+}
 
-/* Sections */
-section { padding: 96px 0; }
-.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--sky); margin: 0 0 14px; }
-h2 { font: 750 clamp(32px, 4.4vw, 48px)/1.08 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
-     letter-spacing: -.03em; margin: 0 0 18px; max-width: 18em; }
-.sub { color: var(--muted); font-size: 19px; max-width: 36em; margin: 0; }
+/* Statement */
+.statement { padding: 128px 0 40px; }
+.statement p { font: 600 clamp(26px, 3.4vw, 40px)/1.22 var(--display); letter-spacing: -.025em; margin: 0; max-width: 24em; color: var(--faint); }
+.statement p strong { color: var(--ink); font-weight: 600; }
 
-.problem { border-top: 1px solid var(--line); }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 48px; }
-@media (max-width: 820px) { .stats { grid-template-columns: 1fr; } }
-.stat { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 26px; }
-.stat b { display: block; font: 750 22px/1.25 -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; letter-spacing: -.01em; margin-bottom: 8px; }
-.stat p { margin: 0; color: var(--muted); font-size: 16px; }
+/* Feature rows */
+.rows { padding: 56px 24px 24px; display: grid; gap: 28px; }
+.row { display: grid; grid-template-columns: 1fr 1.15fr; gap: 56px; align-items: center; padding: 28px 0; }
+.row.flip .copy { order: 2; }
+@media (max-width: 860px) { .row { grid-template-columns: 1fr; gap: 28px; } .row.flip .copy { order: 0; } }
+.kicker { font-size: 14px; font-weight: 600; color: var(--accent); margin: 0 0 10px; }
+h2 { font: 700 clamp(30px, 3.6vw, 42px)/1.08 var(--display); letter-spacing: -.035em; margin: 0 0 16px; text-wrap: balance; }
+.copy p { color: var(--muted); margin: 0; font-size: 18px; max-width: 28em; }
+.copy ul { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 10px; color: var(--ink-2); font-size: 16px; }
+.copy li { display: flex; gap: 10px; }
+.copy li::before { content: ""; flex: none; width: 18px; height: 18px; margin-top: 3px; border-radius: 50%;
+                   background: #eaf6f1 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5.2 9.3l2.4 2.4 5-5' fill='none' stroke='%2313795b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/18px no-repeat; }
+.visual { border-radius: 22px; padding: 40px; min-height: 340px; display: grid; place-items: center; position: relative; overflow: hidden;
+          box-shadow: inset 0 0 0 1px rgba(17,17,19,.05); }
+@media (max-width: 520px) { .visual { padding: 24px 16px; min-height: 280px; } }
+.v-blue { background: linear-gradient(160deg, #eef5ff, #e7eefc); }
+.v-violet { background: linear-gradient(160deg, #f3f0ff, #ebe7fb); }
+.v-mint { background: linear-gradient(160deg, #ecf8f3, #e3f3ec); }
+.v-sand { background: linear-gradient(160deg, #f7f4ee, #f0ece3); }
 
-.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 48px; counter-reset: s; }
-@media (max-width: 820px) { .steps { grid-template-columns: 1fr; } }
-.step { position: relative; padding: 28px; border-radius: 20px; background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015));
-        border: 1px solid var(--line); }
-.step::before { counter-increment: s; content: counter(s); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px;
-                font-weight: 700; font-size: 15px; color: #07080d; background: var(--grad); margin-bottom: 18px; }
-.step h3 { margin: 0 0 8px; font-size: 20px; letter-spacing: -.01em; }
-.step p { margin: 0; color: var(--muted); font-size: 16px; }
+/* Visual: gauge states */
+.gauges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; max-width: 440px; }
+.g { background: var(--paper); border-radius: 16px; padding: 20px 12px 16px; text-align: center; box-shadow: var(--shadow); }
+.g svg { width: 54px; height: 54px; display: block; margin: 0 auto 12px; }
+.g b { display: block; font-size: 14px; }
+.g span { font-size: 12.5px; color: var(--muted); }
 
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 48px; background: var(--line);
-        border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
-@media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
-.feat { background: var(--bg); padding: 30px; }
-.feat .ic { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; margin-bottom: 16px;
-            background: rgba(69,189,255,.1); color: var(--sky); border: 1px solid rgba(69,189,255,.2); }
-.feat h3 { margin: 0 0 6px; font-size: 18px; letter-spacing: -.01em; }
-.feat p { margin: 0; color: var(--muted); font-size: 15.5px; }
-kbd { font: 12.5px ui-monospace, "SF Mono", Menlo, monospace; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px;
-      padding: 1px 6px; background: rgba(255,255,255,.04); color: var(--ink); }
+/* Visual: notification stack */
+.stack { width: 100%; max-width: 400px; display: grid; gap: 10px; }
+.card { background: var(--paper); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow); display: grid; grid-template-columns: 34px 1fr; gap: 2px 12px; text-align: left; }
+.card img { width: 34px; height: 34px; grid-row: span 2; }
+.card .t { font-size: 14px; font-weight: 650; }
+.card .b { font-size: 13.5px; color: var(--muted); line-height: 1.4; }
+.card.dim { opacity: .55; transform: scale(.96); }
 
-.numbers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 48px; }
-@media (max-width: 820px) { .numbers { grid-template-columns: repeat(2, 1fr); } }
-.num { padding: 24px; border-radius: 18px; border: 1px solid var(--line); background: var(--card); }
-.num b { display: block; font: 800 40px/1 -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; letter-spacing: -.03em;
-         background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 10px; }
-.num span { color: var(--muted); font-size: 15px; }
+/* Visual: tab strip */
+.browser { width: 100%; max-width: 460px; background: var(--paper); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.tabs { display: flex; gap: 4px; padding: 10px 10px 0; background: #eceef1; }
+.tab { flex: 1; min-width: 0; display: flex; align-items: center; gap: 7px; padding: 8px 10px; border-radius: 9px 9px 0 0; font-size: 12px;
+       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink-2); }
+.tab.on { background: var(--paper); font-weight: 600; color: var(--ink); }
+.tab i { flex: none; width: 12px; height: 12px; border-radius: 3px; background: var(--faint); }
+.tab.freed { color: var(--faint); }
+.tab.freed i { background: none; width: 13px; height: 13px; border-radius: 3px; box-shadow: inset 0 0 0 1.5px var(--faint); position: relative; }
+.tab.freed i::after { content: ""; position: absolute; left: 3px; right: 3px; bottom: 3px; height: 3px; border-top: 1.5px solid var(--faint); border-radius: 50% 50% 0 0; }
+.page { padding: 22px 20px 24px; display: grid; gap: 10px; }
+.line { height: 9px; border-radius: 5px; background: var(--soft); }
+.freed-note { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #13795b; background: #eaf6f1; border-radius: 10px; padding: 9px 12px; margin-top: 6px; }
 
-.faq { max-width: 760px; }
-details { border-bottom: 1px solid var(--line); padding: 22px 0; }
-summary { cursor: pointer; list-style: none; font-weight: 650; font-size: 18px; display: flex; justify-content: space-between; gap: 16px; }
+/* Visual: keys */
+.keys { display: flex; gap: 12px; }
+kbd.k { display: grid; place-items: center; width: 74px; height: 74px; border-radius: 16px; background: var(--paper);
+        font: 500 30px var(--display); color: var(--ink); padding: 0;
+        box-shadow: 0 1px 0 rgba(17,17,19,.06), 0 6px 0 #ddd9cf, 0 10px 24px rgba(17,17,19,.08), inset 0 0 0 1px rgba(17,17,19,.06); }
+kbd { font: 13px ui-monospace, "SF Mono", Menlo, monospace; padding: 1px 6px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--line); background: var(--paper); }
+@media (max-width: 520px) { kbd.k { width: 58px; height: 58px; font-size: 24px; } }
+
+/* Specs */
+.specs { padding: 96px 0 24px; }
+.spec-grid { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); margin-top: 36px; }
+@media (max-width: 760px) { .spec-grid { grid-template-columns: repeat(2, 1fr); } }
+.spec { padding: 26px 24px 8px 0; }
+.spec b { display: block; font: 700 36px/1 var(--display); letter-spacing: -.03em; margin-bottom: 10px; }
+.spec span { color: var(--muted); font-size: 15px; }
+
+/* FAQ */
+.faq { padding-top: 120px; padding-bottom: 40px; display: grid; grid-template-columns: .8fr 1.2fr; gap: 56px; }
+@media (max-width: 860px) { .faq { grid-template-columns: 1fr; gap: 16px; } }
+details { border-bottom: 1px solid var(--line); padding: 20px 0; }
+details:first-of-type { border-top: 1px solid var(--line); }
+summary { cursor: pointer; list-style: none; font-weight: 600; font-size: 17px; display: flex; justify-content: space-between; gap: 16px; }
 summary::-webkit-details-marker { display: none; }
-summary::after { content: "+"; color: var(--dim); font-weight: 400; font-size: 22px; line-height: 1; transition: transform .2s; }
+summary::after { content: "+"; color: var(--faint); font-size: 22px; line-height: 1; transition: transform .2s; }
 details[open] summary::after { transform: rotate(45deg); }
-details p { color: var(--muted); margin: 12px 0 0; font-size: 16px; }
-details code { font: 13.5px ui-monospace, "SF Mono", Menlo, monospace; background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 6px;
-               word-break: break-all; }
+details p { color: var(--muted); margin: 10px 0 0; font-size: 16px; }
+code { font: 13.5px ui-monospace, "SF Mono", Menlo, monospace; background: var(--soft); padding: 2px 6px; border-radius: 6px; word-break: break-all; }
 
-.cta { text-align: center; background: radial-gradient(50% 60% at 50% 55%, rgba(69,189,255,.10), rgba(135,117,255,.06) 45%, transparent 75%); }
-.cta .wrap { position: relative; display: grid; justify-items: center; }
-.cta img { width: 96px; height: 96px; margin-bottom: 20px; }
-.cta h2 { margin-left: auto; margin-right: auto; }
-.cta .install { margin-top: 28px; text-align: left; width: 100%; max-width: 560px; }
+/* Final CTA */
+.final { margin: 96px 0 0; padding: 88px 24px; text-align: center; background: var(--ink); color: #fff; border-radius: 28px; position: relative; overflow: hidden; }
+.final::before { content: ""; position: absolute; inset: auto -10% -60% -10%; height: 120%;
+                  background: radial-gradient(50% 50% at 50% 50%, rgba(58,168,255,.28), rgba(122,108,255,.16) 45%, transparent 70%); pointer-events: none; }
+.final > * { position: relative; }
+.final img { width: 84px; height: 84px; }
+.final h2 { margin: 22px auto 12px; max-width: 18em; text-wrap: balance; }
+.final p { color: #a1a1aa; margin: 0 auto 30px; max-width: 30em; font-size: 18px; }
+.final .btn-dark { background: #fff; color: var(--ink); }
+.final .btn-dark:hover { background: #ececee; }
+.cmd { display: flex; align-items: center; gap: 8px; max-width: 520px; margin: 0 auto; padding: 7px 7px 7px 16px; border-radius: 12px; text-align: left; }
+.cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; word-break: normal; background: none; padding: 0; font-size: 13px; }
+.cmd button { flex: none; border: 0; border-radius: 8px; padding: 8px 12px; font: 600 13px -apple-system, BlinkMacSystemFont, sans-serif; cursor: pointer; }
+.final .cmd { margin-top: 18px; background: rgba(255,255,255,.07); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
+.final .cmd code { color: #d4d4d8; }
+.final .cmd button { background: rgba(255,255,255,.12); color: #fff; }
 
-footer { border-top: 1px solid var(--line); padding: 32px 0; color: var(--dim); font-size: 14px; }
+footer { padding: 40px 0 56px; color: var(--faint); font-size: 14px; }
 footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+footer a { text-decoration: none; }
+footer a:hover { color: var(--ink); }
 
-.reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+/* Install dialog */
+dialog { border: 0; padding: 0; border-radius: 22px; width: min(520px, calc(100% - 32px)); box-shadow: 0 40px 120px rgba(17,17,19,.3); color: var(--ink); }
+dialog::backdrop { background: rgba(17,17,19,.32); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.dlg { position: relative; padding: 30px 30px 26px; }
+.dlg h3 { font: 700 24px/1.2 var(--display); letter-spacing: -.02em; margin: 0 0 6px; }
+.dlg > p { margin: 0 0 22px; color: var(--muted); font-size: 15.5px; }
+.dlg ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 18px; counter-reset: n; }
+.dlg li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; font-size: 15.5px; counter-increment: n; }
+.dlg li::before { content: counter(n); display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--soft);
+                  font-weight: 650; font-size: 13px; }
+.dlg li > span { min-width: 0; }
+.dlg .cmd { margin: 10px 0 0; background: var(--soft); box-shadow: inset 0 0 0 1px var(--line); }
+.dlg .cmd button { background: var(--ink); color: #fff; }
+.dlg .close { position: absolute; top: 14px; right: 14px; width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--soft);
+              cursor: pointer; font-size: 17px; color: var(--muted); line-height: 1; }
+.dlg .note { margin: 22px 0 0; font-size: 13.5px; color: var(--faint); }
+
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
 .reveal.in { opacity: 1; transform: none; }
 .no-js .reveal { opacity: 1; transform: none; }
 </style>
@@ -141,156 +235,245 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
 <nav>
   <div class="wrap">
-    <a class="brand" href="#"><img src="assets/icon.png" alt="">Cue</a>
-    <div class="links">
-      <a href="#how">How it works</a>
+    <a class="brand" href="#top"><img src="assets/icon.png" alt="">Cue</a>
+    <div class="navlinks">
       <a href="#features">Features</a>
       <a href="#faq">FAQ</a>
-      <a class="pill" href="#get">Get Cue — free</a>
+      <a class="btn btn-dark" href="#install" data-install>Install</a>
     </div>
   </div>
 </nav>
 
-<header class="hero">
-  <div class="wrap">
-    <div>
-      <span class="badge"><i></i>For Macs that lag after a long day</span>
-      <h1>Your Mac, <span class="g">before it freezes.</span></h1>
-      <p class="lede">Cue watches your Mac's memory, warns you before it slows down, tells you in plain words which app is the cause, and fixes it with one click.</p>
-      <div class="install" id="get">
-        <code><span class="p">$ </span><span id="cmd">curl -fsSL https://trycue.github.io/install.sh | bash</span></code>
-        <button class="copy" type="button" data-copy="cmd">Copy</button>
+<main id="top">
+  <header class="hero">
+    <div class="wrap">
+      <span class="tag"><b>Free</b>A menu bar app for Apple silicon Macs</span>
+      <h1>Your Mac shouldn't freeze.</h1>
+      <p class="lede">Cue watches your Mac's memory, warns you before things slow down, and frees up whatever is hogging it, in one click.</p>
+      <div class="cta-row">
+        <a class="btn btn-dark" href="#install" data-install>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8m0 0L4.8 6.8M8 10l3.2-3.2M3 13h10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Install for Mac
+        </a>
+        <a class="btn btn-ghost" href="#features">See how it works</a>
       </div>
-      <div class="meta"><span>Free</span><span>No account</span><span>No admin password</span><span>Apple silicon · macOS 13+</span></div>
-    </div>
-    <div class="shot">
-      <div class="menubar" aria-hidden="true">
-        <span>9:41</span>
-        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M14.3 6.2A6.4 6.4 0 1 0 14.3 11.8" fill="none" stroke="#ff5a5f" stroke-width="2.2" stroke-linecap="round"/><circle cx="15.8" cy="9" r="1.6" fill="#ff5a5f"/></svg>
+      <p class="fineprint">macOS 13 or later · 600 KB · No account needed</p>
+
+      <div class="scene" role="img" aria-label="A Mac desktop: Cue's red ring in the menu bar, a notification saying the Mac is about to slow down, and Cue's panel listing Google Chrome as very heavy.">
+        <div class="mbar" aria-hidden="true">
+          <div class="l"><b>Chrome</b><span>File</span><span>Edit</span><span>View</span><span>History</span></div>
+          <div class="r">
+            <span class="cueitem"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M14.3 6.2A6.4 6.4 0 1 0 14.3 11.8" fill="none" stroke="#ef4b4b" stroke-width="2.3" stroke-linecap="round"/><circle cx="15.8" cy="9" r="1.6" fill="#ef4b4b"/></svg></span>
+            <span class="glyph"></span><span class="glyph"></span>
+            <span>Tue 9:41</span>
+          </div>
+        </div>
+        <div class="notif" aria-hidden="true">
+          <img src="assets/icon.png" alt="">
+          <div class="t">Your Mac is about to slow down <span>now</span></div>
+          <div class="b">Google Chrome is using the most memory.</div>
+          <div class="a">Free up Google Chrome</div>
+        </div>
+        <div class="win" aria-hidden="true">
+          <div class="wtabs"><span class="dots"><i></i><i></i><i></i></span>
+            <span class="wt"></span><span class="wt"></span><span class="wt on"></span><span class="wt"></span><span class="wt"></span><span class="wt"></span><span class="wt"></span><span class="wt"></span><span class="wt"></span><span class="wt"></span><span class="wt"></span><span class="wt"></span>
+          </div>
+          <div class="wbody"><div class="line" style="width:40%;height:14px"></div><div class="line" style="width:86%"></div><div class="line" style="width:78%"></div><div class="line" style="width:82%"></div><div class="line" style="width:64%"></div>
+            <div class="wgrid"><div></div><div></div><div></div></div></div>
+        </div>
+        <img class="panel" src="assets/panel-light.png" width="379" height="425" alt="">
       </div>
-      <img src="assets/panel.png" width="379" height="425" alt="Cue's panel: the Mac is 93% busy, memory is running low. It freed 1.4 GB from 3 Google Chrome tabs and lists Chrome as very heavy, Slack as heavy.">
     </div>
-  </div>
-</header>
+  </header>
 
-<section class="problem">
-  <div class="wrap reveal">
-    <p class="eyebrow">The problem</p>
-    <h2>Macs don't crash. They just get slower until you can't work.</h2>
-    <p class="sub">Every browser tab is its own process. Leave a few dozen open next to Slack and a video call, and your Mac quietly runs out of memory. By the time the beachball appears, it's too late.</p>
-    <div class="stats">
-      <div class="stat"><b>Tabs pile up</b><p>Chrome, Edge, Brave and Arc run tabs as separate processes. Heavy web apps can take a gigabyte each.</p></div>
-      <div class="stat"><b>Swap kicks in</b><p>When memory runs out, macOS starts writing it to disk. Everything feels sticky, fans spin, the Mac heats up.</p></div>
-      <div class="stat"><b>No warning</b><p>macOS doesn't tell you until things freeze, and Activity Monitor isn't something most people want to read.</p></div>
+  <section class="statement">
+    <div class="wrap reveal">
+      <p>Macs rarely crash. They just get slower. <strong>Browser tabs, Slack and video calls quietly fill up memory, and macOS says nothing until the beachball.</strong> Cue speaks up first.</p>
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="how">
-  <div class="wrap reveal">
-    <p class="eyebrow">How it works</p>
-    <h2>A gauge in your menu bar that acts before you notice.</h2>
-    <div class="steps">
-      <div class="step"><h3>Watches</h3><p>A tiny helper checks memory, swapping, CPU and heat every few seconds. The ring in your menu bar fills as your Mac gets busier.</p></div>
-      <div class="step"><h3>Warns</h3><p>Past the level you choose, Cue tells you what's wrong in plain words, like “Google Chrome is using the most memory.”</p></div>
-      <div class="step"><h3>Frees</h3><p>One click frees the heaviest background tabs or quits an app you've allowed. Or let Cue do it for you automatically.</p></div>
+  <section class="rows wrap" id="features">
+    <div class="row reveal">
+      <div class="copy">
+        <p class="kicker">See it coming</p>
+        <h2>A gauge that lives in your menu bar.</h2>
+        <p>A small ring fills up as your Mac gets busier. It stays out of the way while things are fine, and changes colour well before you'd notice a slowdown.</p>
+        <ul>
+          <li>Watches memory, swapping, CPU and heat</li>
+          <li>You pick when to be warned: early, balanced or late</li>
+        </ul>
+      </div>
+      <div class="visual v-blue" aria-hidden="true">
+        <div class="gauges">
+          <div class="g"><svg viewBox="0 0 56 54"><circle cx="27" cy="27" r="21" fill="none" stroke="#ececef" stroke-width="6" stroke-linecap="round" stroke-dasharray="102.6 200" transform="translate(0 54) scale(1 -1) rotate(40 27 27)"/><circle cx="27" cy="27" r="21" fill="none" stroke="#3a3a40" stroke-width="6" stroke-linecap="round" stroke-dasharray="30.8 200" transform="translate(0 54) scale(1 -1) rotate(40 27 27)"/><circle cx="48" cy="27" r="3.4" fill="#3a3a40"/></svg><b>Fine</b><span>Quiet</span></div>
+          <div class="g"><svg viewBox="0 0 56 54"><circle cx="27" cy="27" r="21" fill="none" stroke="#ececef" stroke-width="6" stroke-linecap="round" stroke-dasharray="102.6 200" transform="translate(0 54) scale(1 -1) rotate(40 27 27)"/><circle cx="27" cy="27" r="21" fill="none" stroke="#f59e2c" stroke-width="6" stroke-linecap="round" stroke-dasharray="77.0 200" transform="translate(0 54) scale(1 -1) rotate(40 27 27)"/><circle cx="48" cy="27" r="3.4" fill="#f59e2c"/></svg><b>Busy</b><span>Heads-up</span></div>
+          <div class="g"><svg viewBox="0 0 56 54"><circle cx="27" cy="27" r="21" fill="none" stroke="#ececef" stroke-width="6" stroke-linecap="round" stroke-dasharray="102.6 200" transform="translate(0 54) scale(1 -1) rotate(40 27 27)"/><circle cx="27" cy="27" r="21" fill="none" stroke="#ef4b4b" stroke-width="6" stroke-linecap="round" stroke-dasharray="97.5 200" transform="translate(0 54) scale(1 -1) rotate(40 27 27)"/><circle cx="48" cy="27" r="3.4" fill="#ef4b4b"/></svg><b>Critical</b><span>Cue steps in</span></div>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
 
-<section id="features">
-  <div class="wrap reveal">
-    <p class="eyebrow">Features</p>
-    <h2>Careful by design.</h2>
-    <p class="sub">Cue frees memory without losing your work. It never touches the tab you're using, macOS itself, or anything you mark as off-limits.</p>
-    <div class="grid">
-      <div class="feat"><div class="ic">◐</div><h3>Frees tabs, keeps them</h3><p>Heavy background tabs stay in your tab bar. Click one and it reloads. Your busiest tab and extensions are never touched.</p></div>
-      <div class="feat"><div class="ic">Aa</div><h3>Plain words</h3><p>No graphs or jargon. Cue says which app is the problem and what will happen if you click.</p></div>
-      <div class="feat"><div class="ic">⌘</div><h3>Emergency shortcut</h3><p>Mac already frozen? Press <kbd>⌃</kbd><kbd>⌥</kbd><kbd>⌘</kbd><kbd>F</kbd> and Cue frees memory right away.</p></div>
-      <div class="feat"><div class="ic">↻</div><h3>Fixes it for you</h3><p>Optional auto-fix steps in once per slowdown, only for browser tabs and the apps you list as OK to quit.</p></div>
-      <div class="feat"><div class="ic">◎</div><h3>Never gets stuck</h3><p>The watcher runs as its own process with priority from macOS, and restarts by itself if anything goes wrong.</p></div>
-      <div class="feat"><div class="ic">⌂</div><h3>Private</h3><p>Everything runs on your Mac. Optional anonymous stats are off with one switch and never include names, files or websites.</p></div>
+    <div class="row flip reveal">
+      <div class="copy">
+        <p class="kicker">Know what's wrong</p>
+        <h2>Plain words, not graphs.</h2>
+        <p>No Activity Monitor, no jargon. Cue names the app that's hogging memory and tells you exactly what clicking will do.</p>
+        <ul>
+          <li>Warns when it matters, and reminds you every 15 minutes if things don't improve</li>
+          <li>Act straight from the notification</li>
+        </ul>
+      </div>
+      <div class="visual v-violet" aria-hidden="true">
+        <div class="stack">
+          <div class="card dim"><img src="assets/icon.png" alt=""><div class="t">Your Mac is getting busy</div><div class="b">Slack is using the most memory.</div></div>
+          <div class="card"><img src="assets/icon.png" alt=""><div class="t">Your Mac is about to slow down</div><div class="b">Google Chrome is using the most memory.</div></div>
+          <div class="card"><img src="assets/icon.png" alt=""><div class="t">Cue stopped a slowdown</div><div class="b">Freed 1.4 GB from 3 Google Chrome tabs.</div></div>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
 
-<section>
-  <div class="wrap reveal">
-    <p class="eyebrow">Lightweight</p>
-    <h2>Smaller than a single browser tab.</h2>
-    <div class="numbers">
-      <div class="num"><b>~4 MB</b><span>memory for the background watcher</span></div>
-      <div class="num"><b>&lt;1%</b><span>of one CPU core while idle</span></div>
-      <div class="num"><b>600 KB</b><span>download</span></div>
-      <div class="num"><b>10 sec</b><span>to install, nothing to configure</span></div>
+    <div class="row reveal">
+      <div class="copy">
+        <p class="kicker">Fix it in one click</p>
+        <h2>Free memory without losing a thing.</h2>
+        <p>Cue frees the heaviest background tabs. They stay right where they were in your tab bar and come back when you click them.</p>
+        <ul>
+          <li>Never touches the tab you're using or your extensions</li>
+          <li>Quits other apps only when you say so, and they still ask to save</li>
+          <li>Optional: let Cue fix it for you, once per slowdown</li>
+        </ul>
+      </div>
+      <div class="visual v-mint" aria-hidden="true">
+        <div class="browser">
+          <div class="tabs">
+            <div class="tab freed"><i></i>Q3 planning doc</div>
+            <div class="tab on"><i style="background:#3a7cff"></i>Inbox</div>
+            <div class="tab freed"><i></i>Figma – Onboarding</div>
+            <div class="tab freed"><i></i>YouTube</div>
+          </div>
+          <div class="page">
+            <div class="line" style="width:62%"></div>
+            <div class="line" style="width:88%"></div>
+            <div class="line" style="width:74%"></div>
+            <div class="freed-note">
+              <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#13795b"/><path d="M4.8 8.3l2.1 2.1 4.3-4.3" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Freed 1.4 GB from 3 background tabs
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
 
-<section id="faq">
-  <div class="wrap reveal"><div class="faq">
-    <p class="eyebrow">FAQ</p>
-    <h2>Questions</h2>
-    <details><summary>Why do I install it with Terminal?</summary>
-      <p>Cue is free and independent, so it isn't on the App Store. The install line downloads Cue, checks it matches the published checksum, puts it in Applications and starts it. No admin password, and nothing outside your own user account. You can read the script first at <a href="install.sh">install.sh</a>.</p></details>
-    <details><summary>Will I lose my tabs?</summary>
-      <p>No. Freed tabs stay in your tab bar and show Chrome's “Aw, Snap!” page. Click Reload and they come back. Cue never frees the tab you're most likely using.</p></details>
-    <details><summary>Does it work with Slack, Edge, Brave or Arc?</summary>
-      <p>Cue can free tabs in Chrome, Edge, Brave, Arc, Vivaldi, Opera and Chromium. For any other app, like Slack or Teams, it tells you when it's heavy and can quit it for you. Apps still ask to save first.</p></details>
-    <details><summary>What does Cue send?</summary>
-      <p>If you leave “Share anonymous stats” on, once a day: a random install ID, your Mac model, memory size, macOS version, how often Cue warned and fixed, and the names of the heaviest apps. Never your name, files, websites or anything you type. Turn it off in Settings.</p></details>
-    <details><summary>Which Macs does it support?</summary>
-      <p>Macs with Apple silicon (M1 or newer) running macOS 13 Ventura or later.</p></details>
-    <details><summary>How do I uninstall?</summary>
-      <p>Open Cue's Settings and click Uninstall Cue, or run <code>curl -fsSL https://trycue.github.io/install.sh | bash -s -- --uninstall</code>. Everything Cue added is removed, including its settings and caches.</p></details>
-  </div></div>
-</section>
-
-<section class="cta">
-  <div class="wrap reveal">
-    <img src="assets/icon.png" alt="" width="96" height="96">
-    <h2>Stop waiting for the beachball.</h2>
-    <p class="sub">Open Terminal (<kbd>⌘</kbd> <kbd>Space</kbd>, type Terminal), paste this, press Return.</p>
-    <div class="install">
-      <code><span class="p">$ </span><span id="cmd2">curl -fsSL https://trycue.github.io/install.sh | bash</span></code>
-      <button class="copy" type="button" data-copy="cmd2">Copy</button>
+    <div class="row flip reveal">
+      <div class="copy">
+        <p class="kicker">Already frozen?</p>
+        <h2>One shortcut, from anywhere.</h2>
+        <p>Press <kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>⌘</kbd> <kbd>F</kbd> and Cue frees memory right away, even when your Mac is crawling. Its watcher runs as a separate, high-priority process, so it doesn't get stuck with everything else.</p>
+      </div>
+      <div class="visual v-sand" aria-hidden="true">
+        <div class="keys"><kbd class="k">⌃</kbd><kbd class="k">⌥</kbd><kbd class="k">⌘</kbd><kbd class="k">F</kbd></div>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+
+  <section class="specs">
+    <div class="wrap reveal">
+      <h2>Lighter than one browser tab.</h2>
+      <div class="spec-grid">
+        <div class="spec"><b>4 MB</b><span>memory used by the watcher</span></div>
+        <div class="spec"><b>&lt;1%</b><span>of one CPU core when idle</span></div>
+        <div class="spec"><b>0</b><span>passwords or accounts needed</span></div>
+        <div class="spec"><b>Local</b><span>Runs on your Mac. Anonymous stats are optional, off with one switch</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap faq" id="faq">
+    <div class="reveal">
+      <h2>Questions</h2>
+    </div>
+    <div class="reveal">
+      <details><summary>Why do I install it from Terminal?</summary>
+        <p>Cue is free and independent, so it isn't on the App Store. The install line downloads Cue, checks it against the published checksum, puts it in Applications and starts it. No admin password, and nothing outside your own user account. You can <a href="install.sh">read the script</a> first.</p></details>
+      <details><summary>Will I lose my tabs?</summary>
+        <p>No. Freed tabs stay in your tab bar and show Chrome's “Aw, Snap!” page. Click Reload and they're back. Cue never frees the tab you're most likely using.</p></details>
+      <details><summary>Which browsers and apps does it work with?</summary>
+        <p>Cue can free tabs in Chrome, Edge, Brave, Arc, Vivaldi, Opera and Chromium. For other apps, like Slack or Teams, it tells you when they're heavy and can quit them for you. They still ask to save first.</p></details>
+      <details><summary>What does Cue send?</summary>
+        <p>If you leave “Share anonymous stats” on, once a day: a random install ID, your Mac model, memory size, macOS version, how often Cue warned and fixed, and the names of the heaviest apps. Never your name, files, websites or anything you type. Turn it off in Settings.</p></details>
+      <details><summary>Which Macs are supported?</summary>
+        <p>Macs with Apple silicon (M1 or newer) on macOS 13 Ventura or later.</p></details>
+      <details><summary>How do I uninstall?</summary>
+        <p>Open Cue's Settings and click Uninstall Cue, or run <code>curl -fsSL https://trycue.github.io/install.sh | bash -s -- --uninstall</code>. Everything Cue added is removed, settings and caches included.</p></details>
+    </div>
+  </section>
+
+  <section class="wrap" id="install">
+    <div class="final reveal">
+      <img src="assets/icon.png" alt="" width="84" height="84">
+      <h2>Never wait on the beachball again.</h2>
+      <p>Free, 600 KB, and set up in about ten seconds.</p>
+      <a class="btn btn-dark" href="#install" data-install>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8m0 0L4.8 6.8M8 10l3.2-3.2M3 13h10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Install for Mac
+      </a>
+      <div class="cmd"><code id="cmd-final">curl -fsSL https://trycue.github.io/install.sh | bash</code><button type="button" data-copy="cmd-final">Copy</button></div>
+    </div>
+  </section>
+</main>
 
 <footer>
   <div class="wrap">
-    <span>© 2026 Cue</span>
-    <span>Free for Mac · v1.0.3</span>
+    <span>© 2026 Cue · v1.0.3</span>
+    <span><a href="#faq">FAQ</a> · <a href="install.sh">Install script</a></span>
   </div>
 </footer>
 
+<dialog id="install-dialog" aria-labelledby="dlg-title">
+  <div class="dlg">
+    <button class="close" type="button" aria-label="Close" data-close>×</button>
+    <h3 id="dlg-title">Install Cue</h3>
+    <p>Three steps, about ten seconds.</p>
+    <ol>
+      <li><span>Open <b>Terminal</b>: press <kbd>⌘</kbd> <kbd>Space</kbd>, type “Terminal”, press Return.</span></li>
+      <li><span>Paste this line and press Return:
+        <span class="cmd"><code id="cmd-dlg">curl -fsSL https://trycue.github.io/install.sh | bash</code><button type="button" data-copy="cmd-dlg">Copy</button></span></span></li>
+      <li><span>Look for the ring in your menu bar. When macOS asks about notifications, click <b>Allow</b>.</span></li>
+    </ol>
+    <p class="note">No password needed. Apple silicon Macs, macOS 13 or later.</p>
+  </div>
+</dialog>
+
 <script>
 document.body.classList.remove("no-js");
-document.querySelectorAll("[data-copy]").forEach(function (button) {
-  button.addEventListener("click", function () {
-    var source = document.getElementById(button.dataset.copy);
-    navigator.clipboard.writeText(source.textContent).then(function () {
-      button.textContent = "Copied";
-      setTimeout(function () { button.textContent = "Copy"; }, 1600);
-    }, function () {
-      var range = document.createRange();
-      range.selectNodeContents(source);
-      getSelection().removeAllRanges();
-      getSelection().addRange(range);
-      button.textContent = "Press ⌘C";
-    });
+var nav = document.querySelector("nav");
+addEventListener("scroll", function () { nav.classList.toggle("scrolled", scrollY > 8); }, { passive: true });
+
+function copy(button) {
+  var source = document.getElementById(button.dataset.copy);
+  var done = function (label) { button.textContent = label; setTimeout(function () { button.textContent = "Copy"; }, 1600); };
+  navigator.clipboard.writeText(source.textContent).then(function () { done("Copied"); }, function () {
+    var range = document.createRange(); range.selectNodeContents(source);
+    getSelection().removeAllRanges(); getSelection().addRange(range); done("Press ⌘C");
   });
-});
+}
+document.querySelectorAll("[data-copy]").forEach(function (b) { b.addEventListener("click", function () { copy(b); }); });
+
+var dialog = document.getElementById("install-dialog");
+if (dialog.showModal) {
+  document.querySelectorAll("[data-install]").forEach(function (a) {
+    a.addEventListener("click", function (e) { e.preventDefault(); dialog.showModal(); });
+  });
+  dialog.querySelector("[data-close]").addEventListener("click", function () { dialog.close(); });
+  dialog.addEventListener("click", function (e) { if (e.target === dialog) dialog.close(); });
+}
+
 var items = document.querySelectorAll(".reveal");
 if ("IntersectionObserver" in window) {
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.15 });
   items.forEach(function (el) { io.observe(el); });
-} else {
-  items.forEach(function (el) { el.classList.add("in"); });
-}
+} else { items.forEach(function (el) { el.classList.add("in"); }); }
 </script>
 </body>
 </html>
