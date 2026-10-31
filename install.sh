@@ -9,7 +9,7 @@ set -euo pipefail
 
 # Filled in when a release is published. Tests point CUE_BASE_URL at a local server.
 RELEASE_BASE_URL="https://trycue.github.io"
-VERSION="1.0.2"
+VERSION="1.0.3"
 
 BASE_URL="${CUE_BASE_URL:-$RELEASE_BASE_URL}"
 BUNDLE_ID="io.github.trycue.cue"
